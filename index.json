@@ -6,7 +6,6 @@
   "vendor": "SAP",
   "eula": "",
   "license": "",
-  "keywords": ["line", "race", "animation", "echarts"],
   "webcomponents": [
     {
       "kind": "main",
