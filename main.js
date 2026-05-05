@@ -119,7 +119,41 @@ var getScriptPromisify = (src) => {
     async _render () {
       await getScriptPromisify('https://cdnjs.cloudflare.com/ajax/libs/echarts/5.0.0/echarts.min.js')
       this._dispose()
-      // rendering logic added in Task 4
+
+      const parsed = parseData(this.dataBinding)
+      if (!parsed) { return }
+
+      const { timeSteps, series } = parsed
+
+      const chartDiv = this._shadowRoot.getElementById('chart')
+      this._chart = echarts.init(chartDiv)
+
+      this._chart.setOption({
+        legend: { show: true },
+        tooltip: { trigger: 'axis' },
+        xAxis: {
+          type: 'category',
+          data: timeSteps,
+          boundaryGap: false
+        },
+        yAxis: { type: 'value' },
+        series: series.map(s => ({ ...s, data: [] }))
+      })
+
+      let i = 0
+      this._interval = setInterval(() => {
+        if (!this._chart) { return }
+
+        i++
+        if (i > timeSteps.length) { i = 0 }
+
+        this._chart.setOption({
+          series: series.map(s => ({
+            name: s.name,
+            data: s.data.slice(0, i)
+          }))
+        })
+      }, 1000)
     }
   }
 
