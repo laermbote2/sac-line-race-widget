@@ -4,6 +4,7 @@
   "name": "ECharts Line Race",
   "description": "An animated line race chart powered by ECharts",
   "vendor": "SAP",
+  "newInstancePrefix": "LineRace",
   "eula": "",
   "license": "",
   "webcomponents": [
