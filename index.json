@@ -11,7 +11,7 @@
     {
       "kind": "main",
       "tag": "com-sap-sample-echarts-linerace",
-      "url": "https://raw.githubusercontent.com/laermbote2/sac-line-race-widget/master/main.js",
+      "url": "https://cdn.jsdelivr.net/gh/laermbote2/sac-line-race-widget@master/main.js",
       "integrity": "",
       "ignoreIntegrity": true
     }
