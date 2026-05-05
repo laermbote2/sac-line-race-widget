@@ -33,7 +33,7 @@ var getScriptPromisify = (src) => {
   }
 
   const parseData = (dataBinding) => {
-    if (dataBinding.state !== 'success') { return null }
+    if (!dataBinding || dataBinding.state !== 'success') { return null }
 
     const { data, metadata } = dataBinding
     const { dimensions, measures } = parseMetadata(metadata)
@@ -136,7 +136,7 @@ var getScriptPromisify = (src) => {
         await ensureEcharts()
         this._dispose()
 
-      const parsed = parseData(this.dataBinding)
+      const parsed = parseData(this.myDataBinding)
       if (!parsed) { return }
 
       const { timeSteps, series } = parsed
