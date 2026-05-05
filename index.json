@@ -1,0 +1,36 @@
+{
+  "id": "com.sap.sac.sample.echarts.linerace",
+  "version": "1.0.0",
+  "name": "ECharts Line Race",
+  "description": "An animated line race chart powered by ECharts",
+  "vendor": "SAP",
+  "eula": "",
+  "license": "",
+  "keywords": ["line", "race", "animation", "echarts"],
+  "webcomponents": [
+    {
+      "kind": "main",
+      "tag": "com-sap-sample-echarts-linerace",
+      "url": "https://<your-github-username>.github.io/<your-repo>/main.js",
+      "integrity": "",
+      "ignoreIntegrity": true
+    }
+  ],
+  "properties": {},
+  "dataBindings": {
+    "myDataBinding": {
+      "feeds": [
+        {
+          "id": "dimensions",
+          "description": "Dimensions — first: series label, second: time label",
+          "type": "dimension"
+        },
+        {
+          "id": "measures",
+          "description": "Measure — one value feed",
+          "type": "mainStructureMember"
+        }
+      ]
+    }
+  }
+}
