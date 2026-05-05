@@ -11,6 +11,58 @@ var getScriptPromisify = (src) => {
 
 ;(function () {
 
+  const parseMetadata = (metadata) => {
+    const { dimensions: dimensionsMap, mainStructureMembers: measuresMap } = metadata
+    const dimensions = []
+    for (const key in dimensionsMap) {
+      dimensions.push({ key, ...dimensionsMap[key] })
+    }
+    const measures = []
+    for (const key in measuresMap) {
+      measures.push({ key, ...measuresMap[key] })
+    }
+    return { dimensions, measures }
+  }
+
+  const parseData = (dataBinding) => {
+    if (dataBinding.state !== 'success') { return null }
+
+    const { data, metadata } = dataBinding
+    const { dimensions, measures } = parseMetadata(metadata)
+
+    if (dimensions.length < 2 || measures.length < 1) { return null }
+
+    const seriesDimKey = dimensions[0].key   // e.g. "dimensions_0"
+    const timeDimKey   = dimensions[1].key   // e.g. "dimensions_1"
+    const measureKey   = measures[0].key     // e.g. "measures_0"
+
+    // Collect unique sorted time labels
+    const timeSet = new Set()
+    data.forEach(row => timeSet.add(row[timeDimKey].label))
+    const timeSteps = Array.from(timeSet).sort()
+
+    // Group values by series label
+    const seriesMap = {}
+    data.forEach(row => {
+      const seriesLabel = row[seriesDimKey].label
+      const timeLabel   = row[timeDimKey].label
+      const value       = row[measureKey].raw
+
+      if (!seriesMap[seriesLabel]) { seriesMap[seriesLabel] = {} }
+      seriesMap[seriesLabel][timeLabel] = value
+    })
+
+    // Build ECharts series array — null for missing time steps
+    const series = Object.keys(seriesMap).map(name => ({
+      type: 'line',
+      name,
+      data: timeSteps.map(t => seriesMap[name][t] !== undefined ? seriesMap[name][t] : null),
+      smooth: true
+    }))
+
+    return { timeSteps, series }
+  }
+
   const template = document.createElement('template')
   template.innerHTML = `
     <style>
