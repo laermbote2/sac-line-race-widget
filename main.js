@@ -11,6 +11,14 @@ var getScriptPromisify = (src) => {
 
 ;(function () {
 
+  let _echartsReady = null
+  const ensureEcharts = () => {
+    if (!_echartsReady) {
+      _echartsReady = getScriptPromisify('https://cdnjs.cloudflare.com/ajax/libs/echarts/5.0.0/echarts.min.js')
+    }
+    return _echartsReady
+  }
+
   const parseMetadata = (metadata) => {
     const { dimensions: dimensionsMap, mainStructureMembers: measuresMap } = metadata
     const dimensions = []
@@ -88,6 +96,7 @@ var getScriptPromisify = (src) => {
       this._root = this._shadowRoot.getElementById('root')
       this._chart = null
       this._interval = null
+      this._rendering = false
     }
 
     // SAC lifecycle hooks
@@ -98,7 +107,11 @@ var getScriptPromisify = (src) => {
     }
 
     async onCustomWidgetResize (width, height) {
-      await this._render()
+      if (this._chart) {
+        this._chart.resize()
+      } else {
+        await this._render()
+      }
     }
 
     async onCustomWidgetDestroy () {
@@ -117,8 +130,11 @@ var getScriptPromisify = (src) => {
     }
 
     async _render () {
-      await getScriptPromisify('https://cdnjs.cloudflare.com/ajax/libs/echarts/5.0.0/echarts.min.js')
-      this._dispose()
+      if (this._rendering) { return }
+      this._rendering = true
+      try {
+        await ensureEcharts()
+        this._dispose()
 
       const parsed = parseData(this.dataBinding)
       if (!parsed) { return }
@@ -145,7 +161,7 @@ var getScriptPromisify = (src) => {
         if (!this._chart) { return }
 
         i++
-        if (i > timeSteps.length) { i = 0 }
+        if (i >= timeSteps.length) { i = 0 }
 
         this._chart.setOption({
           series: series.map(s => ({
@@ -154,6 +170,9 @@ var getScriptPromisify = (src) => {
           }))
         })
       }, 1000)
+      } finally {
+        this._rendering = false
+      }
     }
   }
 
